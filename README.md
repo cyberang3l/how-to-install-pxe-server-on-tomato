@@ -3594,11 +3594,11 @@ _____________________________________________
 
     ```bash
     mkdir mount
-    fuseiso kali-linux-2016.1-amd64.iso mount
-    rsync -avP mount/* root@192.168.1.1:/opt/www/pxe/kali-linux-2016.1-amd64/
+    fuseiso kali-linux-2018.2-amd64.iso mount
+    rsync -avP mount/ root@192.168.1.1:/opt/www/pxe/kali-linux-2018.2-amd64/
     fusermount -u mount
     rm -r mount
-    rm kali-linux-2016.1-amd64.iso
+    rm kali-linux-2018.2-amd64.iso
     ```
 
 3. In Tomato command line run the following commands (connect with SSH):
@@ -3606,14 +3606,14 @@ _____________________________________________
     ```bash
     mkdir -p /opt/tftpboot/images/
     cd /opt/tftpboot/images/
-    wget http://repo.kali.org/kali/dists/kali-rolling/main/installer-amd64/current/images/netboot/netboot.tar.gz
-    tar xzvf netboot.tar.gz
+    wget http://http.kali.org/kali/dists/kali-rolling/main/installer-amd64/current/images/netboot/netboot.tar.gz
+    tar xvf netboot.tar.gz
     rm netboot.tar.gz ldlinux.c32 pxelinux.0 pxelinux.cfg version.info
-    mv debian-installer kali-linux-2016.1-amd64
-    cd kali-linux-2016.1-amd64/amd64/
-    find /opt/tftpboot/images/kali-linux-2016.1-amd64/amd64/ -exec sed -i 's/debian-installer\/amd64/images\/kali-linux-2016.1-amd64\/amd64/g' {} \;
-    rsync -avP /opt/www/pxe/kali-linux-2016.1-amd64/live/vmlinuz /opt/tftpboot/images/kali-linux-2016.1-amd64/amd64/
-    rsync -avP /opt/www/pxe/kali-linux-2016.1-amd64/live/initrd.img /opt/tftpboot/images/kali-linux-2016.1-amd64/amd64/
+    mv debian-installer kali-linux-2018.2-amd64
+    cd kali-linux-2018.2-amd64/amd64/
+    find /opt/tftpboot/images/kali-linux-2018.2-amd64/amd64/ -type f -exec sed -i 's/debian-installer\/amd64/images\/kali-linux-2018.2-amd64\/amd64/g' {} \;
+    rsync -avP /opt/www/pxe/kali-linux-2018.2-amd64/live/vmlinuz /opt/tftpboot/images/kali-linux-2018.2-amd64/amd64/
+    rsync -avP /opt/www/pxe/kali-linux-2018.2-amd64/live/initrd.img /opt/tftpboot/images/kali-linux-2018.2-amd64/amd64/
     ```
 
 4. In the file `/opt/tftpboot/pxelinux.cfg/default` file add the following lines:
@@ -3624,10 +3624,10 @@ _____________________________________________
                     MENU LABEL ^Back..
                     MENU EXIT
             LABEL Kali Linux Live (4GB Min RAM Requirement)
-                    linux images/kali-linux-2016.1-amd64/amd64/vmlinuz
-                    initrd images/kali-linux-2016.1-amd64/amd64/initrd.img
-                    append vga=788 boot=live username=root hostname=kali fetch=http://192.168.1.1/kali-linux-2016.1-amd64/live/filesystem.squashfs
-            INCLUDE images/kali-linux-2016.1-amd64/amd64/boot-screens/menu.cfg
+                    linux images/kali-linux-2018.2-amd64/amd64/vmlinuz
+                    initrd images/kali-linux-2018.2-amd64/amd64/initrd.img
+                    append vga=788 boot=live username=root hostname=kali fetch=http://192.168.1.1/kali-linux-2018.2-amd64/live/filesystem.squashfs
+            INCLUDE images/kali-linux-2018.2-amd64/amd64/boot-screens/menu.cfg
     MENU END
     ```
 

@@ -85,10 +85,10 @@ MENU BEGIN kalilinux
 		MENU LABEL ^Back..
 		MENU EXIT
 	LABEL Kali Linux Live (4GB Min RAM Requirement)
-		linux images/kali-linux-2016.1-amd64/amd64/vmlinuz
-		initrd images/kali-linux-2016.1-amd64/amd64/initrd.img
-		append vga=788 boot=live username=root hostname=kali fetch=http://192.168.1.1/kali-linux-2016.1-amd64/live/filesystem.squashfs
-	INCLUDE images/kali-linux-2016.1-amd64/amd64/boot-screens/menu.cfg
+		linux images/kali-linux-2018.2-amd64/amd64/vmlinuz
+		initrd images/kali-linux-2018.2-amd64/amd64/initrd.img
+		append vga=788 boot=live username=root hostname=kali fetch=http://192.168.1.1/kali-linux-2018.2-amd64/live/filesystem.squashfs
+	INCLUDE images/kali-linux-2018.2-amd64/amd64/boot-screens/menu.cfg
 MENU END
 
 DEFAULT vesamenu.c32
