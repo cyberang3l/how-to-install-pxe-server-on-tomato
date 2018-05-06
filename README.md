@@ -6,8 +6,8 @@ If you are alredy using ENTWARE or OPTWARE, then you most likely satisfy the req
 If not, you can check the installation instructions for ENTWARE in the following link, and focus in the part that shows how to mount the USB drive:
 https://github.com/Entware-ng/Entware-ng/wiki/Install-on-the-TomatoUSB
 
-**NOTE 1**: ENTWARE per se is not needed as we are using components that are already builtin in TomatoUSB (at least the Shibby version that I am using).  
-**NOTE 2**: My Tomato router is using the internal IP address `192.168.1.1`. So in the following *HOWTO* whenever you see the IP address `192.168.1.1`, change it to the internal IP address of your own Tomato router. 
+**NOTE 1**: ENTWARE per se is not needed as we are using components that are already builtin in TomatoUSB (at least the Shibby version that I am using).
+**NOTE 2**: My Tomato router is using the internal IP address `192.168.1.1`. So in the following *HOWTO* whenever you see the IP address `192.168.1.1`, change it to the internal IP address of your own Tomato router.
 
 ### Enable a web server to serve large files and ISO Images
 
@@ -15,23 +15,23 @@ https://github.com/Entware-ng/Entware-ng/wiki/Install-on-the-TomatoUSB
 2. Save the Changes
 3. In the command line:
 
-  	```bash
-  	mkdir -p /opt/www/pxe
-  	cat << EOF > /opt/www/index.html
-  	<html>
-  	<head>
-  	<script>
-  	function redirect() {
-  	window.location = window.location.protocol + "//" + window.location.hostname + ":80/";
-  	}
-  	</script>
-  	</head>
-  	<body onload="redirect()">
-  	Redirecting to port 80
-  	</body>
-  	</html>
-  	EOF
-  	```
+    ```bash
+    mkdir -p /opt/www/pxe
+    cat << EOF > /opt/www/index.html
+    <html>
+    <head>
+    <script>
+    function redirect() {
+    window.location = window.location.protocol + "//" + window.location.hostname + ":80/";
+    }
+    </script>
+    </head>
+    <body onload="redirect()">
+    Redirecting to port 80
+    </body>
+    </html>
+    EOF
+    ```
 
 4. Through the web interface in the "Web Server" page change:
        * The "*Server Root Path*" to `/opt/www`
@@ -40,18 +40,18 @@ https://github.com/Entware-ng/Entware-ng/wiki/Install-on-the-TomatoUSB
        * If the Status is "*NGINX is currently stopped*", press the "*Start Now*" button.
        * In the NGINX Custom properties box add the following text:
 
-    	```
-    	# NGINX Custom Parameters.
-    	http {
-    	    server {
-    	        listen 80;
-    	        location / {
-    	            root    /opt/www/pxe;
-    	            autoindex on;
-    	        }
-    	    }
-    	}
-    	```
+        ```
+        # NGINX Custom Parameters.
+        http {
+            server {
+                listen 80;
+                location / {
+                    root    /opt/www/pxe;
+                    autoindex on;
+                }
+            }
+        }
+        ```
 
 5. Save the changes
 
@@ -75,11 +75,11 @@ We do that because the custom parameters are appended at the end of the nginx co
 3. Save the changes.
 4. To check if the tftpserver is running, run the following command: `netstat -an | fgrep -w 69`.
     If it returns a line like this:
-  
+
     ```
     udp        0      0 0.0.0.0:69              0.0.0.0:*
     ```
-  
+
     then everything is good. If nothing is returned, then the tftpserver is not running yet. In this case, reboot the router and use the netstat command to check again.
 
 5. Download the latest *syslinux* (at the time of writing this is 6.03) and copy the necessary files to make the PXE boot work.
@@ -102,7 +102,7 @@ We do that because the custom parameters are appended at the end of the nginx co
     cd /opt/tftpboot/
     mkdir pxelinux.cfg
     cd pxelinux.cfg
-    
+
     # The following base64 encoded string is the cool tux background.
     # With the following command we use "cat << EOF" to print the long string until the "EOF" is found,
     # and we redirect the output in the "base64 -d" command to decode the base64 string.
@@ -3413,16 +3413,16 @@ We do that because the custom parameters are appended at the end of the nginx co
     MENU BACKGROUND pxelinux.cfg/tuxbg.png
     MENU COLOR BORDER  * #00000000 #00000000 none
     MENU TITLE Boot menu
-    
-    
+
+
     LABEL localhdd
             MENU LABEL Boot from (local) hard drive
             MENU DEFAULT
             LOCALBOOT -1
-    
+
     LABEL Memory Test
             kernel images/memtest/memtest86-plus-5.01
-    
+
     DEFAULT vesamenu.c32
     PROMPT 0
     TIMEOUT 600
@@ -3445,23 +3445,23 @@ _____________________________________________
 2. In your PC, run the following commands:
 
     ```bash
-  	mkdir mount
-  	fuseiso systemrescuecd-x86-4.7.1.iso mount
-  	rsync -avP mount/* root@192.168.1.1:/opt/www/pxe/systemrescuecd-x86-4.7.1/
-  	fusermount -u mount
-  	rm -r mount
-  	rm systemrescuecd-x86-4.7.1.iso
-  	```
+    mkdir mount
+    fuseiso systemrescuecd-x86-4.7.1.iso mount
+    rsync -avP mount/* root@192.168.1.1:/opt/www/pxe/systemrescuecd-x86-4.7.1/
+    fusermount -u mount
+    rm -r mount
+    rm systemrescuecd-x86-4.7.1.iso
+    ```
 
 3. In the Tomato command line run the following commands (connect with SSH):
 
     ```bash
-  	mkdir -p /opt/tftpboot/images/systemrescuecd-x86-4.7.1
-  	rsync -avP /opt/www/pxe/systemrescuecd-x86-4.7.1/isolinux/rescue64 /opt/tftpboot/images/systemrescuecd-x86-4.7.1/
-  	rsync -avP /opt/www/pxe/systemrescuecd-x86-4.7.1/isolinux/rescue32 /opt/tftpboot/images/systemrescuecd-x86-4.7.1/
-  	rsync -avP /opt/www/pxe/systemrescuecd-x86-4.7.1/isolinux/initram.igz /opt/tftpboot/images/systemrescuecd-x86-4.7.1/
-  	```
-	
+    mkdir -p /opt/tftpboot/images/systemrescuecd-x86-4.7.1
+    rsync -avP /opt/www/pxe/systemrescuecd-x86-4.7.1/isolinux/rescue64 /opt/tftpboot/images/systemrescuecd-x86-4.7.1/
+    rsync -avP /opt/www/pxe/systemrescuecd-x86-4.7.1/isolinux/rescue32 /opt/tftpboot/images/systemrescuecd-x86-4.7.1/
+    rsync -avP /opt/www/pxe/systemrescuecd-x86-4.7.1/isolinux/initram.igz /opt/tftpboot/images/systemrescuecd-x86-4.7.1/
+    ```
+
 4. In the `/opt/tftpboot/pxelinux.cfg/default` file add the following lines:
 
     ```
@@ -3470,13 +3470,13 @@ _____________________________________________
             LABEL Main Menu
                     MENU LABEL ^Back..
                     MENU EXIT
-                    
+
             LABEL system-rescue-cd-4.7.1-x86
                     MENU LABEL system-rescue-cd-4.7.1-x86 (live)
                     kernel images/systemrescuecd-x86-4.7.1/rescue32
                     append initrd=images/systemrescuecd-x86-4.7.1/initram.igz ksdevice=bootif lang=  boothttp=http://192.168.1.1/systemrescuecd-x86-4.7.1/sysrcd.dat text
                     ipappend 2
-                    
+
             LABEL system-rescue-cd-4.7.1-x86_64
                     MENU LABEL system-rescue-cd-4.7.1-x86_64 (live)
                     kernel images/systemrescuecd-x86-4.7.1/rescue64
@@ -3487,21 +3487,71 @@ _____________________________________________
 
 _____________________________________________
 
+#### Ubuntu Bionic Installation from Internet
+
+1. In the Tomato command line run the following commands (connect with SSH):
+
+    ```bash
+    cd /opt/tftpboot/images/
+    wget http://archive.ubuntu.com/ubuntu/dists/bionic/main/installer-amd64/current/images/netboot/netboot.tar.gz
+    tar xzvf netboot.tar.gz
+    mv ubuntu-installer ubuntu-bionic
+    chmod 644 /opt/tftpboot/images/ubuntu-bionic/amd64/linux
+    rm pxelinux.0 pxelinux.cfg version.info ldlinux.c32 netboot.tar.gz
+    cd /opt/tftpboot/images/ubuntu-bionic/amd64/boot-screens
+    sed -i 's/ubuntu-installer\//images\/ubuntu-bionic\//g' * | grep ubuntu
+    cd /opt/tftpboot/images/ubuntu-bionic/amd64/
+    rm -rf pxelinux.0 pxelinux.cfg
+    ```
+
+2. In the file `/opt/tftpboot/pxelinux.cfg/default` file add the following lines:
+
+    ```
+    MENU BEGIN ubuntubionic64
+            MENU TITLE Ubuntu Bionic x86_64
+            LABEL Main Menu
+                    MENU LABEL ^Back..
+                    MENU EXIT
+            INCLUDE images/ubuntu-bionic/amd64/boot-screens/menu.cfg
+    MENU END
+    ```
+
+_____________________________________________
+
+#### Kubuntu Bionic
+
+1. First follow the steps in the section **Ubuntu Bionic Installation from Internet** if you haven't done so
+2. Execute the following commands:
+
+    ```bash
+    cp /opt/tftpboot/images/ubuntu-bionic/amd64/boot-screens/txt.cfg /opt/tftpboot/images/ubuntu-bionic/amd64/boot-screens/txt.cfg.backup
+    sed -i 's|MENU TITLE Ubuntu Bionic x86_64|MENU TITLE (K)Ubuntu Bionic x86_64|' /opt/tftpboot/pxelinux.cfg/default
+
+    cat << EOF >> /opt/tftpboot/images/ubuntu-bionic/amd64/boot-screens/txt.cfg
+    label installkubuntu
+            menu label ^Kubuntu Install
+            kernel images/ubuntu-bionic/amd64/linux preseed/url=http://people.ubuntu.com/~cjwatson/bzr/debian-cd/ubuntu/data/bionic/preseed/kubuntu/kubuntu.seed
+            append vga=788 initrd=images/ubuntu-bionic/amd64/initrd.gz --- quiet
+    EOF
+    ```
+
+_____________________________________________
+
 #### Ubuntu Xenial Installation from Internet
 
 1. In the Tomato command line run the following commands (connect with SSH):
 
     ```bash
-  	cd /opt/tftpboot/images/
-  	wget http://archive.ubuntu.com/ubuntu/dists/xenial/main/installer-amd64/current/images/netboot/netboot.tar.gz
-  	tar xzvf netboot.tar.gz
-  	mv ubuntu-installer ubuntu-xenial
-  	rm pxelinux.0 pxelinux.cfg version.info netboot.tar.gz
-  	cd /opt/tftpboot/images/ubuntu-xenial/amd64/boot-screens
-  	sed -i 's/ubuntu-installer\//images\/ubuntu-xenial\//g' * | grep ubuntu
-  	cd /opt/tftpboot/images/ubuntu-xenial/amd64/
-  	rm -rf pxelinux.0 pxelinux.cfg
-  	```
+    cd /opt/tftpboot/images/
+    wget http://archive.ubuntu.com/ubuntu/dists/xenial/main/installer-amd64/current/images/netboot/netboot.tar.gz
+    tar xzvf netboot.tar.gz
+    mv ubuntu-installer ubuntu-xenial
+    rm pxelinux.0 pxelinux.cfg version.info netboot.tar.gz
+    cd /opt/tftpboot/images/ubuntu-xenial/amd64/boot-screens
+    sed -i 's/ubuntu-installer\//images\/ubuntu-xenial\//g' * | grep ubuntu
+    cd /opt/tftpboot/images/ubuntu-xenial/amd64/
+    rm -rf pxelinux.0 pxelinux.cfg
+    ```
 
 2. In the file `/opt/tftpboot/pxelinux.cfg/default` file add the following lines:
 
@@ -3525,7 +3575,7 @@ _____________________________________________
     ```bash
     cp /opt/tftpboot/images/ubuntu-xenial/amd64/boot-screens/txt.cfg /opt/tftpboot/images/ubuntu-xenial/amd64/boot-screens/txt.cfg.backup
     sed -i 's|MENU TITLE Ubuntu Xenial x86_64|MENU TITLE (K)Ubuntu Xenial x86_64|' /opt/tftpboot/pxelinux.cfg/default
-    
+
     cat << EOF >> /opt/tftpboot/images/ubuntu-xenial/amd64/boot-screens/txt.cfg
     label installkubuntu
             menu label ^Kubuntu Install
@@ -3542,29 +3592,29 @@ _____________________________________________
 2. In your PC, run the following commands:
 
     ```bash
-  	mkdir mount
-  	fuseiso kali-linux-2016.1-amd64.iso mount
-  	rsync -avP mount/* root@192.168.1.1:/opt/www/pxe/kali-linux-2016.1-amd64/
-  	fusermount -u mount
-  	rm -r mount
-  	rm kali-linux-2016.1-amd64.iso
+    mkdir mount
+    fuseiso kali-linux-2016.1-amd64.iso mount
+    rsync -avP mount/* root@192.168.1.1:/opt/www/pxe/kali-linux-2016.1-amd64/
+    fusermount -u mount
+    rm -r mount
+    rm kali-linux-2016.1-amd64.iso
     ```
-    
+
 3. In Tomato command line run the following commands (connect with SSH):
 
     ```bash
-  	mkdir -p /opt/tftpboot/images/
-  	cd /opt/tftpboot/images/
-  	wget http://repo.kali.org/kali/dists/kali-rolling/main/installer-amd64/current/images/netboot/netboot.tar.gz
-  	tar xzvf netboot.tar.gz
-  	rm netboot.tar.gz ldlinux.c32 pxelinux.0 pxelinux.cfg version.info
-  	mv debian-installer kali-linux-2016.1-amd64
-  	cd kali-linux-2016.1-amd64/amd64/
-  	find /opt/tftpboot/images/kali-linux-2016.1-amd64/amd64/ -exec sed -i 's/debian-installer\/amd64/images\/kali-linux-2016.1-amd64\/amd64/g' {} \;
-  	rsync -avP /opt/www/pxe/kali-linux-2016.1-amd64/live/vmlinuz /opt/tftpboot/images/kali-linux-2016.1-amd64/amd64/
-  	rsync -avP /opt/www/pxe/kali-linux-2016.1-amd64/live/initrd.img /opt/tftpboot/images/kali-linux-2016.1-amd64/amd64/
-  	```
-	
+    mkdir -p /opt/tftpboot/images/
+    cd /opt/tftpboot/images/
+    wget http://repo.kali.org/kali/dists/kali-rolling/main/installer-amd64/current/images/netboot/netboot.tar.gz
+    tar xzvf netboot.tar.gz
+    rm netboot.tar.gz ldlinux.c32 pxelinux.0 pxelinux.cfg version.info
+    mv debian-installer kali-linux-2016.1-amd64
+    cd kali-linux-2016.1-amd64/amd64/
+    find /opt/tftpboot/images/kali-linux-2016.1-amd64/amd64/ -exec sed -i 's/debian-installer\/amd64/images\/kali-linux-2016.1-amd64\/amd64/g' {} \;
+    rsync -avP /opt/www/pxe/kali-linux-2016.1-amd64/live/vmlinuz /opt/tftpboot/images/kali-linux-2016.1-amd64/amd64/
+    rsync -avP /opt/www/pxe/kali-linux-2016.1-amd64/live/initrd.img /opt/tftpboot/images/kali-linux-2016.1-amd64/amd64/
+    ```
+
 4. In the file `/opt/tftpboot/pxelinux.cfg/default` file add the following lines:
     ```
     MENU BEGIN kalilinux
@@ -3588,32 +3638,32 @@ _____________________________________________
 2. In your PC, run the following commands:
 
     ```bash
-  	mkdir mount
-  	fuseiso neon-useredition-20161004-1607-amd64.iso mount
-  	rsync -avP --delete mount/* root@192.168.1.1:/opt/www/pxe/neon-useredition/
-  	fusermount -u mount
-  	rm -r mount
-  	rm neon-useredition-20161004-1607-amd64.iso
+    mkdir mount
+    fuseiso neon-useredition-20161004-1607-amd64.iso mount
+    rsync -avP --delete mount/* root@192.168.1.1:/opt/www/pxe/neon-useredition/
+    fusermount -u mount
+    rm -r mount
+    rm neon-useredition-20161004-1607-amd64.iso
     ```
-    
+
 3. In Tomato command line run the following commands (connect with SSH):
 
     ```bash
-  	mkdir -p /opt/tftpboot/images/
-  	cd /opt/tftpboot/images/
-  	mkdir neon-useredition
-  	cd neon-useredition
-  	rsync -avP /opt/www/pxe/neon-useredition/casper/vmlinuz .
-  	rsync -avP /opt/www/pxe/neon-useredition/casper/initrd.lz .
-  	```
-  	
-  	KDE Neon is based on Ubuntu 16.04, and casper, the software that Ubuntu uses to boot live systems, only supports network boot via NFS or CIFS. With the following commands we will modify the casper script and the `initrd.lz` file, to support fetching the the *squashfs* from a web server via http. Note that you may need to install some software from the ENTWARE repository (such as `lzmadec`, `cpio`, `patch` and `findutils`).
-  	
-  	```bash
-  	mkdir initrd
+    mkdir -p /opt/tftpboot/images/
+    cd /opt/tftpboot/images/
+    mkdir neon-useredition
+    cd neon-useredition
+    rsync -avP /opt/www/pxe/neon-useredition/casper/vmlinuz .
+    rsync -avP /opt/www/pxe/neon-useredition/casper/initrd.lz .
+    ```
+
+    KDE Neon is based on Ubuntu 16.04, and casper, the software that Ubuntu uses to boot live systems, only supports network boot via NFS or CIFS. With the following commands we will modify the casper script and the `initrd.lz` file, to support fetching the the *squashfs* from a web server via http. Note that you may need to install some software from the ENTWARE repository (such as `lzmadec`, `cpio`, `patch` and `findutils`).
+
+    ```bash
+    mkdir initrd
     cd initrd
     lzma -dc -S .lz ../initrd.lz | cpio -id
-    
+
     echo 'LS0tIHNjcmlwdHMvY2FzcGVyLm9yaWcJMjAxNi0xMC0wNSAxOTowNzoxMS4wMDAwMDAwMDAgKzAy
     MDAKKysrIHNjcmlwdHMvY2FzcGVyCTIwMTYtMTAtMDUgMTk6MjY6NTguMDAwMDAwMDAwICswMjAw
     CkBAIC0zMyw2ICszMywxMCBAQCBmaQogcGFyc2VfY21kbGluZSgpIHsKICAgICBmb3IgeCBpbiAk
@@ -3645,17 +3695,17 @@ _____________________________________________
     Y2FzcGVyL3Jvb3Quc3F1YXNoZnM7IHRoZW4gcmM9MDsgZmkKKyAgICByZXR1cm4gJHtyY30KK30K
     KwogZG9fbmZzbW91bnQoKSB7CiAgICAgcmM9MQogICAgIG1vZHByb2JlICIke01QX1FVSUVUfSIg
     bmZzCg==' | base64 --decode > casper_http.patch
-    
+
     patch -p0 < casper_http.patch
     rm casper_http.patch
-    
+
     find . | cpio --quiet -o -H newc | lzma -5 > ../http-initrd.lz
-    
+
     cd ..
     rm -rf initrd
     rm -f initrd.lz
-  	```
-	
+    ```
+
 4. In the file `/opt/tftpboot/pxelinux.cfg/default` file add the following lines:
     ```
     MENU BEGIN neonuseredition
@@ -3669,7 +3719,7 @@ _____________________________________________
                     append boot=casper netboot=http fetch=http://192.168.1.1/neon-useredition/casper/filesystem.squashfs
     MENU END
     ```
-    
+
 _____________________________________________
 
 #### CentOS 7
@@ -3677,27 +3727,27 @@ _____________________________________________
 1. In Tomato command line run the following commands (connect with SSH):
 
     ```bash
-  	mkdir -p /opt/tftpboot/images/centos-7-x86_64-netinstall-1511
-  	cd /opt/tftpboot/images/centos-7-x86_64-netinstall-1511
-  	wget http://mirror.centos.org/centos/7/os/x86_64/images/pxeboot/vmlinuz
-  	wget http://mirror.centos.org/centos/7/os/x86_64/images/pxeboot/initrd.img
-  	```
+    mkdir -p /opt/tftpboot/images/centos-7-x86_64-netinstall-1511
+    cd /opt/tftpboot/images/centos-7-x86_64-netinstall-1511
+    wget http://mirror.centos.org/centos/7/os/x86_64/images/pxeboot/vmlinuz
+    wget http://mirror.centos.org/centos/7/os/x86_64/images/pxeboot/initrd.img
+    ```
 
 2. In the file `/opt/tftpboot/pxelinux.cfg/default` file add the following lines:
 
     ```
-    MENU BEGIN centos7_64                                                                                                                                                
+    MENU BEGIN centos7_64
             MENU TITLE Centos 7 x86_64
             LABEL Main Menu
                     MENU LABEL ^Back..
                     MENU EXIT
-                    
+
             LABEL Centos 7 x86_64 NetInstall
                     MENU LABEL centos-7-netinstall
                     kernel images/centos-7-x86_64-netinstall-1511/vmlinuz
                     append initrd=images/centos-7-x86_64-netinstall-1511/initrd.img method=http://mirror.centos.org/centos/7/os/x86_64/ devfs=nomount
                     ipappend 2
-                    
+
             LABEL Centos 7 x86_64 NetInstall (VNC)
                     MENU LABEL centos-7-netinstall-vnc
                     kernel images/centos-7-x86_64-netinstall-1511/vmlinuz
@@ -3741,13 +3791,13 @@ MENU BEGIN sysrescue
         LABEL system-rescue-cd-4.7.1-x86
                 MENU LABEL system-rescue-cd-4.7.1-x86 (live)
                 kernel images/systemrescuecd-x86-4.7.1/rescue32
-                append initrd=images/systemrescuecd-x86-4.7.1/initram.igz ksdevice=bootif lang=  boothttp=http://192.168.1.1/systemrescuecd-x86-4.7.1/sysrcd.dat text 
+                append initrd=images/systemrescuecd-x86-4.7.1/initram.igz ksdevice=bootif lang=  boothttp=http://192.168.1.1/systemrescuecd-x86-4.7.1/sysrcd.dat text
                 ipappend 2
 
         LABEL system-rescue-cd-4.7.1-x86_64
                 MENU LABEL system-rescue-cd-4.7.1-x86_64 (live)
                 kernel images/systemrescuecd-x86-4.7.1/rescue64
-                append initrd=images/systemrescuecd-x86-4.7.1/initram.igz ksdevice=bootif lang=  boothttp=http://192.168.1.1/systemrescuecd-x86-4.7.1/sysrcd.dat text 
+                append initrd=images/systemrescuecd-x86-4.7.1/initram.igz ksdevice=bootif lang=  boothttp=http://192.168.1.1/systemrescuecd-x86-4.7.1/sysrcd.dat text
                 ipappend 2
 MENU END
 
@@ -3766,7 +3816,7 @@ MENU BEGIN centos7_64
         LABEL Centos 7 x86_64 NetInstall (VNC)
                 MENU LABEL centos-7-netinstall-vnc
                 kernel images/centos-7-x86_64-netinstall-1511/vmlinuz vnc
-                append initrd=images/centos-7-x86_64-netinstall-1511/initrd.img method=http://mirror.centos.org/centos/7/os/x86_64/ devfs=nomount 
+                append initrd=images/centos-7-x86_64-netinstall-1511/initrd.img method=http://mirror.centos.org/centos/7/os/x86_64/ devfs=nomount
                 ipappend 2
 MENU END
 
@@ -3790,7 +3840,7 @@ MENU BEGIN neonuseredition
 MENU END
 
 MENU BEGIN kalilinux
-        MENU TITLE Kali Linux 
+        MENU TITLE Kali Linux
         LABEL Main Menu
                 MENU LABEL ^Back..
                 MENU EXIT
