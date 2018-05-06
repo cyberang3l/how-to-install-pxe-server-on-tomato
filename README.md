@@ -3761,5 +3761,4 @@ _____________________________________________
 
 ### Appendix
 
-You can take a loon in my Sample `/opt/tftpboot/pxelinux.cfg/default` configuration file including all of
-the above OS' [here](default).
+You can take a look in my Sample `/opt/tftpboot/pxelinux.cfg/default` configuration file that includes all of the above OS' [here](default).
