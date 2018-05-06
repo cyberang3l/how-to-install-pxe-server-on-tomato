@@ -3531,7 +3531,7 @@ _____________________________________________
     cat << EOF >> /opt/tftpboot/images/ubuntu-bionic/amd64/boot-screens/txt.cfg
     label installkubuntu
             menu label ^Kubuntu Install
-            kernel images/ubuntu-bionic/amd64/linux preseed/url=http://people.ubuntu.com/~cjwatson/bzr/debian-cd/ubuntu/data/bionic/preseed/kubuntu/kubuntu.seed
+            kernel images/ubuntu-bionic/amd64/linux preseed/url=http://people.canonical.com/~cjwatson/bzr/debian-cd/ubuntu/data/bionic/preseed/kubuntu/kubuntu.seed
             append vga=788 initrd=images/ubuntu-bionic/amd64/initrd.gz --- quiet
     EOF
     ```
@@ -3580,7 +3580,7 @@ _____________________________________________
     cat << EOF >> /opt/tftpboot/images/ubuntu-xenial/amd64/boot-screens/txt.cfg
     label installkubuntu
             menu label ^Kubuntu Install
-            kernel images/ubuntu-xenial/amd64/linux preseed/url=http://people.ubuntu.com/~cjwatson/bzr/debian-cd/ubuntu/data/xenial/preseed/kubuntu/kubuntu.seed
+            kernel images/ubuntu-xenial/amd64/linux preseed/url=http://people.canonical.com/~cjwatson/bzr/debian-cd/ubuntu/data/xenial/preseed/kubuntu/kubuntu.seed
             append vga=788 initrd=images/ubuntu-xenial/amd64/initrd.gz --- quiet
     EOF
     ```
