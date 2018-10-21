@@ -3640,11 +3640,11 @@ _____________________________________________
 
     ```bash
     mkdir mount
-    fuseiso neon-useredition-20161004-1607-amd64.iso mount
+    fuseiso neon-useredition-20181011-0542-amd64.iso mount
     rsync -avP --delete mount/* root@192.168.1.1:/opt/www/pxe/neon-useredition/
     fusermount -u mount
     rm -r mount
-    rm neon-useredition-20161004-1607-amd64.iso
+    rm neon-useredition-20181011-0542-amd64.iso
     ```
 
 3. In Tomato command line run the following commands (connect with SSH):
@@ -3714,7 +3714,7 @@ _____________________________________________
             LABEL Main Menu
                     MENU LABEL ^Back..
                     MENU EXIT
-            LABEL KDE Neon User Edition Live (2GB Min RAM Requirement)
+            LABEL KDE Neon User Edition Live (4GB Min RAM Requirement)
                     linux images/neon-useredition/vmlinuz
                     initrd images/neon-useredition/http-initrd.lz
                     append boot=casper netboot=http fetch=http://192.168.1.1/neon-useredition/casper/filesystem.squashfs
