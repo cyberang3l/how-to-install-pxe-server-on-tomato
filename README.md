@@ -81,8 +81,8 @@ We do that because the custom parameters are appended at the end of the nginx co
     dhcp-vendorclass=UEFI,PXEClient:Arch:00009
 
     # Boot the correct bootloader based on the tag
-    dhcp-boot=tag:BIOS,pxelinux.0
-    dhcp-boot=tag:UEFI,bootx64.efi
+    dhcp-boot=tag:BIOS,bios/pxelinux.0
+    dhcp-boot=tag:UEFI,efi64/bootx64.efi
     ```
 
 3. Save the changes.
@@ -3670,75 +3670,28 @@ _____________________________________________
 2. In your PC, run the following commands:
 
     ```bash
+	ssh root@192.168.1.1 "mkdir -p /opt/tftpboot/images/neon-useredition"
+	ssh root@192.168.1.1 "mkdir -p /opt/www/pxe/neon-useredition"
+
+	# Mount the iso to extract vmlinuz and initrd
     mkdir mount
-    fuseiso neon-useredition-20181011-0542-amd64.iso mount
-    rsync -avP --delete mount/* root@192.168.1.1:/opt/www/pxe/neon-useredition/
+    fuseiso neon-user-20210506-0945.iso mount
+
+	# Send vmlinuz and initrd to the Tomato router
+	# Note that when using rsync, the trailing slashes are needed
+	rsync -avP mount/casper/vmlinuz root@192.168.1.1:/opt/tftpboot/images/neon-useredition/
+	rsync -avP mount/casper/initrd root@192.168.1.1:/opt/tftpboot/images/neon-useredition/
+
+	# Unmount the iso and send the iso over to the Tomato router
     fusermount -u mount
+    rsync -avP neon-user-20210506-0945.iso root@192.168.1.1:/opt/www/pxe/neon-useredition/
+
+	# Cleanup
     rm -r mount
-    rm neon-useredition-20181011-0542-amd64.iso
+	rm neon-user-20210506-0945.iso
     ```
 
-3. In Tomato command line run the following commands (connect with SSH):
-
-    ```bash
-    mkdir -p /opt/tftpboot/images/
-    cd /opt/tftpboot/images/
-    mkdir neon-useredition
-    cd neon-useredition
-    rsync -avP /opt/www/pxe/neon-useredition/casper/vmlinuz .
-    rsync -avP /opt/www/pxe/neon-useredition/casper/initrd.lz .
-    ```
-
-    KDE Neon is based on Ubuntu 16.04, and casper, the software that Ubuntu uses to boot live systems, only supports network boot via NFS or CIFS. With the following commands we will modify the casper script and the `initrd.lz` file, to support fetching the the *squashfs* from a web server via http. Note that you may need to install some software from the ENTWARE repository (such as `lzmadec`, `cpio`, `patch` and `findutils`).
-
-    ```bash
-    mkdir initrd
-    cd initrd
-    lzma -dc -S .lz ../initrd.lz | cpio -id
-
-    echo 'LS0tIHNjcmlwdHMvY2FzcGVyLm9yaWcJMjAxNi0xMC0wNSAxOTowNzoxMS4wMDAwMDAwMDAgKzAy
-    MDAKKysrIHNjcmlwdHMvY2FzcGVyCTIwMTYtMTAtMDUgMTk6MjY6NTguMDAwMDAwMDAwICswMjAw
-    CkBAIC0zMyw2ICszMywxMCBAQCBmaQogcGFyc2VfY21kbGluZSgpIHsKICAgICBmb3IgeCBpbiAk
-    KGNhdCAvcHJvYy9jbWRsaW5lKTsgZG8KICAgICAgICAgY2FzZSAkeCBpbgorICAgICAgICAgICAg
-    bmV0Ym9vdD0qKQorICAgICAgICAgICAgICAgIGV4cG9ydCBORVRCT09UPSIke3gjbmV0Ym9vdD19
-    Ijs7CisgICAgICAgICAgICBmZXRjaD0qKQorICAgICAgICAgICAgICAgIGV4cG9ydCBVUkw9IiR7
-    eCNmZXRjaD19Ijs7CiAgICAgICAgICAgICBzaG93bW91bnRzfHNob3ctY293KQogICAgICAgICAg
-    ICAgICAgIGV4cG9ydCBTSE9XTU9VTlRTPSdZZXMnIDs7CiAgICAgICAgICAgICBwZXJzaXN0ZW50
-    KQpAQCAtMjEyLDIwICsyMTYsMzEgQEAgZG9fbmV0bW91bnQoKSB7CiAgICAgICAgIE5GU1JPT1Q9
-    JHtST09UU0VSVkVSfToke1JPT1RQQVRIfQogICAgIGZpCiAKLSAgICBbICIkcXVpZXQiICE9ICJ5
-    IiBdICYmIGxvZ19iZWdpbl9tc2cgIlRyeWluZyBuZXRib290IGZyb20gJHtORlNST09UfSIKLQot
-    ICAgIGlmIFsgIiR7TkVUQk9PVH0iICE9ICJuZnMiIF0gJiYgZG9fY2lmc21vdW50IDsgdGhlbgot
-    ICAgICAgICByYz0wCi0gICAgZWxpZiBkb19uZnNtb3VudCA7IHRoZW4KLSAgICAgICAgTkVUQk9P
-    VD0ibmZzIgotICAgICAgICBleHBvcnQgTkVUQk9PVAotICAgICAgICByYz0wCi0gICAgZmkKKyAg
-    ICBjYXNlICR7TkVUQk9PVH0gaW4gCisgICAgICAgIG5mcykKKyAgICAgICAgICAgIFsgIiRxdWll
-    dCIgIT0gInkiIF0gJiYgbG9nX2JlZ2luX21zZyAiVHJ5aW5nIG5ldGJvb3QgZnJvbSAke05GU1JP
-    T1R9IgorICAgICAgICAgICAgaWYgZG9fbmZzbW91bnQgOyB0aGVuIHJjPTA7IGZpIAk7OworICAg
-    ICAgICBjaWZzKQorICAgICAgICAgICAgWyAiJHF1aWV0IiAhPSAieSIgXSAmJiBsb2dfYmVnaW5f
-    bXNnICJUcnlpbmcgbmV0Ym9vdCBmcm9tICR7TkZTUk9PVH0iCisgICAgICAgICAgICBpZiBkb19j
-    aWZzbW91bnQgOyB0aGVuIHJjPTA7IGZpIDs7CisgICAgICAgIGh0dHApCisgICAgICAgICAgICBb
-    ICIkcXVpZXQiICE9ICJ5IiBdICYmIGxvZ19iZWdpbl9tc2cgIlRyeWluZyBuZXRib290IGZyb20g
-    JHtVUkx9IgorICAgICAgICAgICAgaWYgZG9faHR0cG1vdW50IDsgdGhlbiByYz0wOyBmaSA7Owor
-    ICAgIGVzYWMKIAogICAgIFsgIiRxdWlldCIgIT0gInkiIF0gJiYgbG9nX2VuZF9tc2cKICAgICBy
-    ZXR1cm4gJHtyY30KIH0KIAorZG9faHR0cG1vdW50KCkgeworICAgIHJjPTEKKyAgICBta2RpciAt
-    cCAke21vdW50cG9pbnR9CisgICAgbW91bnQgLXQgdG1wZnMgLW8gc2l6ZT1gd2dldCAke1VSTH0g
-    LS1zcGlkZXIgLS1zZXJ2ZXItcmVzcG9uc2UgLU8gLSAyPiYxIHwgc2VkIC1uZSAnL0NvbnRlbnQt
-    TGVuZ3RoL3tzLy4qOiAvLztwfSdgIHRtcGZzICR7bW91bnRwb2ludH0KKyAgICBta2RpciAtcCAk
-    e21vdW50cG9pbnR9L2Nhc3BlcgorICAgIGlmIHdnZXQgJHtVUkx9IC1PICR7bW91bnRwb2ludH0v
-    Y2FzcGVyL3Jvb3Quc3F1YXNoZnM7IHRoZW4gcmM9MDsgZmkKKyAgICByZXR1cm4gJHtyY30KK30K
-    KwogZG9fbmZzbW91bnQoKSB7CiAgICAgcmM9MQogICAgIG1vZHByb2JlICIke01QX1FVSUVUfSIg
-    bmZzCg==' | base64 --decode > casper_http.patch
-
-    patch -p0 < casper_http.patch
-    rm casper_http.patch
-
-    find . | cpio --quiet -o -H newc | lzma -5 > ../http-initrd.lz
-
-    cd ..
-    rm -rf initrd
-    rm -f initrd.lz
-    ```
-
-4. In the file `/opt/tftpboot/pxelinux.cfg/default` file add the following lines:
+3. In Tomato, in the file `/opt/tftpboot/pxelinux.cfg/default` file add the following lines:
     ```
     MENU BEGIN neonuseredition
             MENU TITLE KDE Neon
@@ -3747,8 +3700,8 @@ _____________________________________________
                     MENU EXIT
             LABEL KDE Neon User Edition Live (4GB Min RAM Requirement)
                     linux images/neon-useredition/vmlinuz
-                    initrd images/neon-useredition/http-initrd.lz
-                    append boot=casper netboot=http fetch=http://192.168.1.1/neon-useredition/casper/filesystem.squashfs
+                    initrd images/neon-useredition/initrd
+                    append boot=casper ip=dhcp url=http://192.168.1.1/neon-useredition/neon-user-20210506-0945.iso
     MENU END
     ```
 
