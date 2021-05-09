@@ -1,4 +1,4 @@
-# How to install a PXE Server with multiple images on TomatoUSB (Shibby)
+# How to install a PXE Server with multiple images on TomatoUSB | FreshTomato
 
 In this tutorial a 4GB or larger USB flash or hard drive needs to be mounted under `/opt` folder.
 
@@ -6,9 +6,9 @@ If you are alredy using ENTWARE or OPTWARE, then you most likely satisfy the req
 If not, you can check the installation instructions for ENTWARE in the following link, and focus in the part that shows how to mount the USB drive:
 https://github.com/Entware-ng/Entware-ng/wiki/Install-on-the-TomatoUSB
 
-**NOTE 1**: ENTWARE per se is not needed as we are using components that are already builtin in TomatoUSB (at least the Shibby version that I am using).
+**NOTE 1**: ENTWARE per se is not needed as we are using components that are already builtin in FreshTomato
 
-**NOTE 2**: My Tomato router is using the internal IP address `192.168.1.1`. So in the following *HOWTO* whenever you see the IP address `192.168.1.1`, change it to the internal IP address of your own Tomato router.
+**NOTE 2**: My Tomato router is using the internal IP address `192.168.1.1`. So in the following *HOWTO* whenever you see the IP address `192.168.1.1`, change it to the internal IP address of your own router.
 
 ### Enable a web server to serve large files and ISO Images
 
@@ -61,16 +61,28 @@ https://github.com/Entware-ng/Entware-ng/wiki/Install-on-the-TomatoUSB
 With the above changes, we actually run two web servers on different ports. One on port 85, and one on port 80.
 We do that because the custom parameters are appended at the end of the nginx configuration file, so we cannot enable the `autoindex` for the root directory we choose in the "*Server Root Path*". If anyone connects to port 85, we just redirect them to port 80 with the html file we created in step 3. The `autoindex` functionality is needed later that we will use the web server to serve some local images from our PXE server.
 
-### Prepare the TFTP Server and PXE
+### Prepare the TFTP Server and PXE with BIOS / UEFI support
 
 1. Create the folder that will be used for the pxe/tftp: `mkdir /opt/tftpboot/`
 
 2. Enable the builtin dnsmasq TFTP server by adding the following lines in the dnsmasq custom configuration box (*Advanced->DHCP/DNS*):
 
     ```
-    enable-tftp
-    tftp-root=/opt/tftpboot
-    dhcp-boot=pxelinux.0
+	# Detailed logging of DHCP requests. Very useful for troubleshooting
+	log-dhcp
+
+	# Enable TFTP
+	enable-tftp
+	tftp-root=/opt/tftpboot
+
+    # Configure BIOS/UEFI tags based on the Arch
+    dhcp-vendorclass=BIOS,PXEClient:Arch:00000
+    dhcp-vendorclass=UEFI,PXEClient:Arch:00007
+    dhcp-vendorclass=UEFI,PXEClient:Arch:00009
+
+    # Boot the correct bootloader based on the tag
+    dhcp-boot=tag:BIOS,pxelinux.0
+    dhcp-boot=tag:UEFI,bootx64.efi
     ```
 
 3. Save the changes.
@@ -81,20 +93,39 @@ We do that because the custom parameters are appended at the end of the nginx co
     udp        0      0 0.0.0.0:69              0.0.0.0:*
     ```
 
-    then everything is good. If nothing is returned, then the tftpserver is not running yet. In this case, reboot the router and use the netstat command to check again.
+    then everything is good. If nothing is returned, then the tftpserver is not running yet. In this case, check the logs (`/var/log/messages`) and try to reboot the router. Use the netstat command to check again.
 
 5. Download the latest *syslinux* (at the time of writing this is 6.03) and copy the necessary files to make the PXE boot work.
 
     ```bash
-    cd /opt/tftpboot/
-    wget ftp://www.kernel.org/pub/linux/utils/boot/syslinux/syslinux-6.03.tar.gz
-    tar xzvf syslinux-6.03.tar.gz
-    cp syslinux-6.03/bios/core/pxelinux.0 .
-    cp syslinux-6.03/bios/com32/elflink/ldlinux/ldlinux.c32 .
-    cp syslinux-6.03/bios/com32/menu/vesamenu.c32 .
-    cp syslinux-6.03/bios/com32/lib/libcom32.c32 .
-    cp syslinux-6.03/bios/com32/libutil/libutil.c32 .
-    rm -rf syslinux-6.03*
+	cd /opt/tftpboot/
+
+	# Get syslinux
+	wget https://mirrors.edge.kernel.org/pub/linux/utils/boot/syslinux/syslinux-6.03.tar.gz
+	tar xvf syslinux-6.03.tar.gz
+
+	mkdir -p pxelinux.cfg images bios efi64
+
+	# BIOS boot loader
+	cp syslinux-6.03/bios/core/pxelinux.0 bios/
+	cp syslinux-6.03/bios/com32/elflink/ldlinux/ldlinux.c32 bios/
+	cp syslinux-6.03/bios/com32/menu/vesamenu.c32 bios/
+	cp syslinux-6.03/bios/com32/lib/libcom32.c32 bios/
+	cp syslinux-6.03/bios/com32/libutil/libutil.c32 bios/
+
+	# UEFI boot loader
+	cp syslinux-6.03/efi64/efi/syslinux.efi efi64/
+	cp syslinux-6.03/efi64/com32/elflink/ldlinux/ldlinux.e64 efi64/
+	cp syslinux-6.03/efi64/com32/menu/vesamenu.c32 efi64/
+	cp syslinux-6.03/efi64/com32/lib/libcom32.c32 efi64/
+	cp syslinux-6.03/efi64/com32/libutil/libutil.c32 efi64/
+
+	# Both the BIOS and UEFI boot loaders will share the same config
+	cd bios && ln -s ../images . && ln -s ../pxelinux.cfg .  && cd ..
+	cd efi64 && ln -s ../images . && ln -s ../pxelinux.cfg .  && cd ..
+
+	# Cleanup
+	rm -rf syslinux-6.03*
     ```
 
 6. Create the PXE configuration directory and add a cool tux background with the following super huge *cat/base64* command.
