@@ -40,19 +40,18 @@ https://github.com/Entware-ng/Entware-ng/wiki/Install-on-the-TomatoUSB
        * Tick the "*Enable Server on Start*"
        * If the Status is "*NGINX is currently stopped*", press the "*Start Now*" button.
        * In the NGINX Custom properties box add the following text:
-
-        ```
-        # NGINX Custom Parameters.
-        http {
-            server {
-                listen 80;
-                location / {
-                    root    /opt/www/pxe;
-                    autoindex on;
-                }
+    ```
+    # NGINX Custom Parameters.
+    http {
+        server {
+            listen 80;
+            location / {
+                root    /opt/www/pxe;
+                autoindex on;
             }
         }
-        ```
+    }
+    ```
 
 5. Save the changes
 
@@ -68,12 +67,12 @@ We do that because the custom parameters are appended at the end of the nginx co
 2. Enable the builtin dnsmasq TFTP server by adding the following lines in the dnsmasq custom configuration box (*Advanced->DHCP/DNS*):
 
     ```
-	# Detailed logging of DHCP requests. Very useful for troubleshooting
-	log-dhcp
+    # Detailed logging of DHCP requests. Very useful for troubleshooting
+    log-dhcp
 
-	# Enable TFTP
-	enable-tftp
-	tftp-root=/opt/tftpboot
+    # Enable TFTP
+    enable-tftp
+    tftp-root=/opt/tftpboot
 
     # Configure BIOS/UEFI tags based on the Arch
     dhcp-vendorclass=BIOS,PXEClient:Arch:00000
@@ -98,34 +97,34 @@ We do that because the custom parameters are appended at the end of the nginx co
 5. Download the latest *syslinux* (at the time of writing this is 6.03) and copy the necessary files to make the PXE boot work.
 
     ```bash
-	cd /opt/tftpboot/
+    cd /opt/tftpboot/
 
-	# Get syslinux
-	wget https://mirrors.edge.kernel.org/pub/linux/utils/boot/syslinux/syslinux-6.03.tar.gz
-	tar xvf syslinux-6.03.tar.gz
+    # Get syslinux
+    wget https://mirrors.edge.kernel.org/pub/linux/utils/boot/syslinux/syslinux-6.03.tar.gz
+    tar xvf syslinux-6.03.tar.gz
 
-	mkdir -p pxelinux.cfg images bios efi64
+    mkdir -p pxelinux.cfg images bios efi64
 
-	# BIOS boot loader
-	cp syslinux-6.03/bios/core/pxelinux.0 bios/
-	cp syslinux-6.03/bios/com32/elflink/ldlinux/ldlinux.c32 bios/
-	cp syslinux-6.03/bios/com32/menu/vesamenu.c32 bios/
-	cp syslinux-6.03/bios/com32/lib/libcom32.c32 bios/
-	cp syslinux-6.03/bios/com32/libutil/libutil.c32 bios/
+    # BIOS boot loader
+    cp syslinux-6.03/bios/core/pxelinux.0 bios/
+    cp syslinux-6.03/bios/com32/elflink/ldlinux/ldlinux.c32 bios/
+    cp syslinux-6.03/bios/com32/menu/vesamenu.c32 bios/
+    cp syslinux-6.03/bios/com32/lib/libcom32.c32 bios/
+    cp syslinux-6.03/bios/com32/libutil/libutil.c32 bios/
 
-	# UEFI boot loader
-	cp syslinux-6.03/efi64/efi/syslinux.efi efi64/
-	cp syslinux-6.03/efi64/com32/elflink/ldlinux/ldlinux.e64 efi64/
-	cp syslinux-6.03/efi64/com32/menu/vesamenu.c32 efi64/
-	cp syslinux-6.03/efi64/com32/lib/libcom32.c32 efi64/
-	cp syslinux-6.03/efi64/com32/libutil/libutil.c32 efi64/
+    # UEFI boot loader
+    cp syslinux-6.03/efi64/efi/syslinux.efi efi64/
+    cp syslinux-6.03/efi64/com32/elflink/ldlinux/ldlinux.e64 efi64/
+    cp syslinux-6.03/efi64/com32/menu/vesamenu.c32 efi64/
+    cp syslinux-6.03/efi64/com32/lib/libcom32.c32 efi64/
+    cp syslinux-6.03/efi64/com32/libutil/libutil.c32 efi64/
 
-	# Both the BIOS and UEFI boot loaders will share the same config
-	cd bios && ln -s ../images . && ln -s ../pxelinux.cfg .  && cd ..
-	cd efi64 && ln -s ../images . && ln -s ../pxelinux.cfg .  && cd ..
+    # Both the BIOS and UEFI boot loaders will share the same config
+    cd bios && ln -s ../images . && ln -s ../pxelinux.cfg .  && cd ..
+    cd efi64 && ln -s ../images . && ln -s ../pxelinux.cfg .  && cd ..
 
-	# Cleanup
-	rm -rf syslinux-6.03*
+    # Cleanup
+    rm -rf syslinux-6.03*
     ```
 
 6. Create the PXE configuration directory and add a cool tux background with the following super huge *cat/base64* command.
@@ -3670,25 +3669,25 @@ _____________________________________________
 2. In your PC, run the following commands:
 
     ```bash
-	ssh root@192.168.1.1 "mkdir -p /opt/tftpboot/images/neon-useredition"
-	ssh root@192.168.1.1 "mkdir -p /opt/www/pxe/neon-useredition"
+    ssh root@192.168.1.1 "mkdir -p /opt/tftpboot/images/neon-useredition"
+    ssh root@192.168.1.1 "mkdir -p /opt/www/pxe/neon-useredition"
 
-	# Mount the iso to extract vmlinuz and initrd
+    # Mount the iso to extract vmlinuz and initrd
     mkdir mount
     fuseiso neon-user-20210506-0945.iso mount
 
-	# Send vmlinuz and initrd to the Tomato router
-	# Note that when using rsync, the trailing slashes are needed
-	rsync -avP mount/casper/vmlinuz root@192.168.1.1:/opt/tftpboot/images/neon-useredition/
-	rsync -avP mount/casper/initrd root@192.168.1.1:/opt/tftpboot/images/neon-useredition/
+    # Send vmlinuz and initrd to the Tomato router
+    # Note that when using rsync, the trailing slashes are needed
+    rsync -avP mount/casper/vmlinuz root@192.168.1.1:/opt/tftpboot/images/neon-useredition/
+    rsync -avP mount/casper/initrd root@192.168.1.1:/opt/tftpboot/images/neon-useredition/
 
-	# Unmount the iso and send the iso over to the Tomato router
+    # Unmount the iso and send the iso over to the Tomato router
     fusermount -u mount
     rsync -avP neon-user-20210506-0945.iso root@192.168.1.1:/opt/www/pxe/neon-useredition/
 
-	# Cleanup
+    # Cleanup
     rm -r mount
-	rm neon-user-20210506-0945.iso
+    rm neon-user-20210506-0945.iso
     ```
 
 3. In Tomato, in the file `/opt/tftpboot/pxelinux.cfg/default` file add the following lines:
