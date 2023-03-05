@@ -81,7 +81,7 @@ We do that because the custom parameters are appended at the end of the nginx co
 
     # Boot the correct bootloader based on the tag
     dhcp-boot=tag:BIOS,bios/pxelinux.0
-    dhcp-boot=tag:UEFI,efi64/bootx64.efi
+    dhcp-boot=tag:UEFI,efi64/syslinux.efi
     ```
 
 3. Save the changes.
