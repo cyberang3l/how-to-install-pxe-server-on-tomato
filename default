@@ -1,5 +1,5 @@
 MENU HSHIFT 3
-MENU WIDTH 74 
+MENU WIDTH 74
 MENU MARGIN 8
 MENU BACKGROUND pxelinux.cfg/tuxbg.png
 MENU COLOR BORDER  * #00000000 #00000000 none
@@ -23,13 +23,13 @@ MENU BEGIN sysrescue
 	LABEL system-rescue-cd-4.7.1-x86
 		MENU LABEL system-rescue-cd-4.7.1-x86 (live)
 		kernel images/systemrescuecd-x86-4.7.1/rescue32
-		append initrd=images/systemrescuecd-x86-4.7.1/initram.igz ksdevice=bootif lang=  boothttp=http://192.168.1.1/systemrescuecd-x86-4.7.1/sysrcd.dat text 
+		append initrd=images/systemrescuecd-x86-4.7.1/initram.igz ksdevice=bootif lang=  boothttp=http://192.168.1.1/systemrescuecd-x86-4.7.1/sysrcd.dat text
 		ipappend 2
 
 	LABEL system-rescue-cd-4.7.1-x86_64
 		MENU LABEL system-rescue-cd-4.7.1-x86_64 (live)
 		kernel images/systemrescuecd-x86-4.7.1/rescue64
-		append initrd=images/systemrescuecd-x86-4.7.1/initram.igz ksdevice=bootif lang=  boothttp=http://192.168.1.1/systemrescuecd-x86-4.7.1/sysrcd.dat text 
+		append initrd=images/systemrescuecd-x86-4.7.1/initram.igz ksdevice=bootif lang=  boothttp=http://192.168.1.1/systemrescuecd-x86-4.7.1/sysrcd.dat text
 		ipappend 2
 MENU END
 
@@ -48,39 +48,39 @@ MENU BEGIN centos7_64
 	LABEL Centos 7 x86_64 NetInstall (VNC)
 		MENU LABEL centos-7-netinstall-vnc
 		kernel images/centos-7-x86_64-netinstall-1511/vmlinuz vnc
-		append initrd=images/centos-7-x86_64-netinstall-1511/initrd.img method=http://mirror.centos.org/centos/7/os/x86_64/ devfs=nomount 
+		append initrd=images/centos-7-x86_64-netinstall-1511/initrd.img method=http://mirror.centos.org/centos/7/os/x86_64/ devfs=nomount
 		ipappend 2
 MENU END
 
 MENU BEGIN ubuntubionic64
-        MENU TITLE (K)Ubuntu Bionic x86_64
-        LABEL Main Menu
-                MENU LABEL ^Back..
-                MENU EXIT
-        INCLUDE images/ubuntu-bionic/amd64/boot-screens/menu.cfg
+	MENU TITLE (K)Ubuntu Bionic x86_64
+	LABEL Main Menu
+		MENU LABEL ^Back..
+		MENU EXIT
+	INCLUDE images/ubuntu-bionic/amd64/boot-screens/menu.cfg
 MENU END
 
 MENU BEGIN ubuntuxenial64
-        MENU TITLE (K)Ubuntu Xenial x86_64
-        LABEL Main Menu
-                MENU LABEL ^Back..
-                MENU EXIT
-        INCLUDE images/ubuntu-xenial/amd64/boot-screens/menu.cfg
+	MENU TITLE (K)Ubuntu Xenial x86_64
+	LABEL Main Menu
+		MENU LABEL ^Back..
+		MENU EXIT
+	INCLUDE images/ubuntu-xenial/amd64/boot-screens/menu.cfg
 MENU END
 
 MENU BEGIN neonuseredition
-        MENU TITLE KDE Neon
-        LABEL Main Menu
-                MENU LABEL ^Back..
-                MENU EXIT
-        LABEL KDE Neon User Edition Live/Setup (Requires 2GB Min RAM)
-		linux images/neon-useredition/vmlinuz
-		initrd images/neon-useredition/http-initrd.lz
-                append boot=casper netboot=http fetch=http://192.168.1.1/neon-useredition/casper/filesystem.squashfs
+	MENU TITLE KDE Neon
+	LABEL Main Menu
+		MENU LABEL ^Back..
+		MENU EXIT
+	LABEL KDE Neon User Edition Live (4GB Min RAM Requirement)
+		linux http://192.168.1.1/neon-useredition/vmlinuz
+		initrd http://192.168.1.1/neon-useredition/initrd
+		append boot=casper ip=dhcp url=http://192.168.1.1/neon-useredition/neon-user-20230504-0714.iso
 MENU END
 
 MENU BEGIN kalilinux
-	MENU TITLE Kali Linux 
+	MENU TITLE Kali Linux
 	LABEL Main Menu
 		MENU LABEL ^Back..
 		MENU EXIT

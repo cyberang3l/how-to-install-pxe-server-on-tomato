@@ -80,7 +80,7 @@ We do that because the custom parameters are appended at the end of the nginx co
     dhcp-vendorclass=UEFI,PXEClient:Arch:00009
 
     # Boot the correct bootloader based on the tag
-    dhcp-boot=tag:BIOS,bios/pxelinux.0
+    dhcp-boot=tag:BIOS,bios/lpxelinux.0
     dhcp-boot=tag:UEFI,efi64/syslinux.efi
     ```
 
@@ -106,7 +106,7 @@ We do that because the custom parameters are appended at the end of the nginx co
     mkdir -p pxelinux.cfg images bios efi64
 
     # BIOS boot loader
-    cp syslinux-6.03/bios/core/pxelinux.0 bios/
+    cp syslinux-6.03/bios/core/lpxelinux.0 bios/
     cp syslinux-6.03/bios/com32/elflink/ldlinux/ldlinux.c32 bios/
     cp syslinux-6.03/bios/com32/menu/vesamenu.c32 bios/
     cp syslinux-6.03/bios/com32/lib/libcom32.c32 bios/
@@ -3669,17 +3669,16 @@ _____________________________________________
 2. In your PC, run the following commands:
 
     ```bash
-    ssh root@192.168.1.1 "mkdir -p /opt/tftpboot/images/neon-useredition"
     ssh root@192.168.1.1 "mkdir -p /opt/www/pxe/neon-useredition"
 
     # Mount the iso to extract vmlinuz and initrd
     mkdir mount
-    fuseiso neon-user-20210506-0945.iso mount
+    fuseiso neon-user-20230504-0714.iso mount
 
     # Send vmlinuz and initrd to the Tomato router
     # Note that when using rsync, the trailing slashes are needed
-    rsync -avP mount/casper/vmlinuz root@192.168.1.1:/opt/tftpboot/images/neon-useredition/
-    rsync -avP mount/casper/initrd root@192.168.1.1:/opt/tftpboot/images/neon-useredition/
+    rsync -avP mount/casper/vmlinuz root@192.168.1.1:/opt/www/pxe/neon-useredition/
+    rsync -avP mount/casper/initrd root@192.168.1.1:/opt/www/pxe/neon-useredition/
 
     # Unmount the iso and send the iso over to the Tomato router
     fusermount -u mount
@@ -3687,7 +3686,7 @@ _____________________________________________
 
     # Cleanup
     rm -r mount
-    rm neon-user-20210506-0945.iso
+    rm neon-user-20230504-0714.iso
     ```
 
 3. In Tomato, in the file `/opt/tftpboot/pxelinux.cfg/default` file add the following lines:
@@ -3698,9 +3697,9 @@ _____________________________________________
                     MENU LABEL ^Back..
                     MENU EXIT
             LABEL KDE Neon User Edition Live (4GB Min RAM Requirement)
-                    linux images/neon-useredition/vmlinuz
-                    initrd images/neon-useredition/initrd
-                    append boot=casper ip=dhcp url=http://192.168.1.1/neon-useredition/neon-user-20210506-0945.iso
+                    linux http://192.168.1.1/neon-useredition/vmlinuz
+                    initrd http://192.168.1.1/neon-useredition/initrd
+                    append boot=casper ip=dhcp url=http://192.168.1.1/neon-useredition/neon-user-20230504-0714.iso
     MENU END
     ```
 
